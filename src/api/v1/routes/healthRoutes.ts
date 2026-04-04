@@ -1,17 +1,27 @@
-import { Router, Request, Response } from "express";
-
-const router = Router();
+import express, { Router, Request, Response } from "express";
 
 /**
- * @route GET /health
- * @description Health check endpoint
- * @returns {object} 200 - Server status
+ * Represents the response structure for a health check endpoint
  */
-router.get("/health", (req: Request, res: Response) => {
-  res.status(200).json({
+interface HealthCheckResponse {
+  status: string;
+  uptime: number;
+  timestamp: string;
+  version: string;
+}
+
+const router: Router = express.Router();
+
+// Health check endpoint
+router.get("/health", (req: Request, res: Response): void => {
+  // Create a response object that matches our interface
+  const healthData: HealthCheckResponse = {
     status: "OK",
-    message: "Server is running",
-  });
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    version: "1.0.0",
+  };
+  res.json(healthData);
 });
 
 export default router;
