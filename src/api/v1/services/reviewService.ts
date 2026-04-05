@@ -1,58 +1,90 @@
-/**
- * In-memory storage for reviews
- */
-let reviews: { id: string; targetId: string; targetType: string; rating: number; comment: string }[] = [];
+import { Review } from "../models/reviewModel";
+import * as firestoreRepository from "../repositories/firestoreRepository";
+
+const REVIEWS_COLLECTION = "reviews";
 
 /**
- * Retrieves all reviews
- * @returns Array of all reviews
+ * Retrieves all reviews from Firestore
+ * @returns Promise resolving to array of reviews
  */
-export const getAllReviews = () => {
-  return reviews;
+export const getAllReviews = async (): Promise<Review[]> => {
+  try {
+    const snapshot = await firestoreRepository.getDocuments(REVIEWS_COLLECTION);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Review));
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to get reviews: ${errorMessage}`);
+  }
 };
 
 /**
- * Retrieves a single review by ID
+ * Retrieves a single review by ID from Firestore
  * @param id - Review ID
- * @returns Review object or undefined
+ * @returns Promise resolving to review or null
  */
-export const getReviewById = (id: string) => {
-  return reviews.find((r) => r.id === id);
+export const getReviewById = async (id: string): Promise<Review | null> => {
+  try {
+    const doc = await firestoreRepository.getDocumentById(REVIEWS_COLLECTION, id);
+    if (!doc) return null;
+    return { id: doc.id, ...doc.data() } as Review;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to get review: ${errorMessage}`);
+  }
 };
 
 /**
- * Creates a new review
+ * Creates a new review in Firestore
  * @param review - Review data
- * @returns Created review
+ * @returns Promise resolving to created review
  */
-export const createReview = (review: { targetId: string; targetType: string; rating: number; comment: string }) => {
-  const newReview = { id: Date.now().toString(), ...review };
-  reviews.push(newReview);
-  return newReview;
+export const createReview = async (review: Omit<Review, "id" | "createdAt" | "updatedAt">): Promise<Review> => {
+  try {
+    const newReview = {
+      ...review,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const id = await firestoreRepository.createDocument<Review>(REVIEWS_COLLECTION, newReview);
+    return { id, ...newReview };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to create review: ${errorMessage}`);
+  }
 };
 
 /**
- * Updates an existing review
+ * Updates an existing review in Firestore
  * @param id - Review ID
  * @param review - Updated review data
- * @returns Updated review or undefined
+ * @returns Promise resolving to updated review or null
  */
-export const updateReview = (id: string, review: { targetId: string; targetType: string; rating: number; comment: string }) => {
-  const index = reviews.findIndex((r) => r.id === id);
-  if (index === -1) return undefined;
-  reviews[index] = { id, ...review };
-  return reviews[index];
+export const updateReview = async (id: string, review: Partial<Review>): Promise<Review | null> => {
+  try {
+    const existing = await getReviewById(id);
+    if (!existing) return null;
+    const updatedReview = { ...review, updatedAt: new Date() };
+    await firestoreRepository.updateDocument<Review>(REVIEWS_COLLECTION, id, updatedReview);
+    return { ...existing, ...updatedReview };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to update review: ${errorMessage}`);
+  }
 };
 
 /**
- * Deletes a review
+ * Deletes a review from Firestore
  * @param id - Review ID
- * @returns Deleted review or undefined
+ * @returns Promise resolving to deleted review or null
  */
-export const deleteReview = (id: string) => {
-  const index = reviews.findIndex((r) => r.id === id);
-  if (index === -1) return undefined;
-  const deleted = reviews[index];
-  reviews.splice(index, 1);
-  return deleted;
+export const deleteReview = async (id: string): Promise<Review | null> => {
+  try {
+    const existing = await getReviewById(id);
+    if (!existing) return null;
+    await firestoreRepository.deleteDocument(REVIEWS_COLLECTION, id);
+    return existing;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to delete review: ${errorMessage}`);
+  }
 };
