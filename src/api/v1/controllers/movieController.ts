@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
+import { successResponse } from "../models/responseModel";
 import * as movieService from "../services/movieService";
 
 /**
@@ -7,17 +8,12 @@ import * as movieService from "../services/movieService";
  * @param req - Express request object
  * @param res - Express response object
  */
-export const getAllMovies = (req: Request, res: Response): void => {
+export const getAllMovies = async (req: Request, res: Response): Promise<void> => {
   try {
-    const movies = movieService.getAllMovies();
-    res.status(HTTP_STATUS.OK).json({
-      message: "Movies retrieved successfully",
-      data: movies,
-    });
+    const movies = await movieService.getAllMovies();
+    res.status(HTTP_STATUS.OK).json(successResponse(movies, "Movies retrieved successfully"));
   } catch (error: unknown) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to retrieve movies",
-    });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to retrieve movies" });
   }
 };
 
@@ -26,22 +22,17 @@ export const getAllMovies = (req: Request, res: Response): void => {
  * @param req - Express request object
  * @param res - Express response object
  */
-export const getMovieById = (req: Request, res: Response): void => {
+export const getMovieById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const movie = movieService.getMovieById(id);
+    const movie = await movieService.getMovieById(id);
     if (!movie) {
       res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Movie not found" });
       return;
     }
-    res.status(HTTP_STATUS.OK).json({
-      message: "Movie retrieved successfully",
-      data: movie,
-    });
+    res.status(HTTP_STATUS.OK).json(successResponse(movie, "Movie retrieved successfully"));
   } catch (error: unknown) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to retrieve movie",
-    });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to retrieve movie" });
   }
 };
 
@@ -50,17 +41,12 @@ export const getMovieById = (req: Request, res: Response): void => {
  * @param req - Express request object
  * @param res - Express response object
  */
-export const createMovie = (req: Request, res: Response): void => {
+export const createMovie = async (req: Request, res: Response): Promise<void> => {
   try {
-    const movie = movieService.createMovie(req.body);
-    res.status(HTTP_STATUS.CREATED).json({
-      message: "Movie created successfully",
-      data: movie,
-    });
+    const movie = await movieService.createMovie(req.body);
+    res.status(HTTP_STATUS.CREATED).json(successResponse(movie, "Movie created successfully"));
   } catch (error: unknown) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to create movie",
-    });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to create movie" });
   }
 };
 
@@ -69,22 +55,17 @@ export const createMovie = (req: Request, res: Response): void => {
  * @param req - Express request object
  * @param res - Express response object
  */
-export const updateMovie = (req: Request, res: Response): void => {
+export const updateMovie = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const updated = movieService.updateMovie(id, req.body);
+    const updated = await movieService.updateMovie(id, req.body);
     if (!updated) {
       res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Movie not found" });
       return;
     }
-    res.status(HTTP_STATUS.OK).json({
-      message: "Movie updated successfully",
-      data: updated,
-    });
+    res.status(HTTP_STATUS.OK).json(successResponse(updated, "Movie updated successfully"));
   } catch (error: unknown) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to update movie",
-    });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to update movie" });
   }
 };
 
@@ -93,20 +74,16 @@ export const updateMovie = (req: Request, res: Response): void => {
  * @param req - Express request object
  * @param res - Express response object
  */
-export const deleteMovie = (req: Request, res: Response): void => {
+export const deleteMovie = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const deleted = movieService.deleteMovie(id);
+    const deleted = await movieService.deleteMovie(id);
     if (!deleted) {
       res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Movie not found" });
       return;
     }
-    res.status(HTTP_STATUS.OK).json({
-      message: "Movie deleted successfully",
-    });
+    res.status(HTTP_STATUS.OK).json(successResponse({}, "Movie deleted successfully"));
   } catch (error: unknown) {
-    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-      message: "Failed to delete movie",
-    });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to delete movie" });
   }
 };

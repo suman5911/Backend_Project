@@ -1,58 +1,84 @@
-/**
- * In-memory storage for movies
- */
-let movies: { id: string; title: string; genre: string; releaseYear: number; description: string; rating: number }[] = [];
+import { Movie } from "../models/movieModel";
+import * as firestoreRepository from "../repositories/firestoreRepository";
+
+const MOVIES_COLLECTION = "movies";
 
 /**
- * Retrieves all movies
- * @returns Array of all movies
+ * Retrieves all movies from Firestore
+ * @returns Promise resolving to array of movies
  */
-export const getAllMovies = () => {
-  return movies;
+export const getAllMovies = async (): Promise<Movie[]> => {
+  try {
+    const snapshot = await firestoreRepository.getDocuments(MOVIES_COLLECTION);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Movie));
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to get movies: ${errorMessage}`);
+  }
 };
 
 /**
- * Retrieves a single movie by ID
+ * Retrieves a single movie by ID from Firestore
  * @param id - Movie ID
- * @returns Movie object or undefined
+ * @returns Promise resolving to movie or null
  */
-export const getMovieById = (id: string) => {
-  return movies.find((movie) => movie.id === id);
+export const getMovieById = async (id: string): Promise<Movie | null> => {
+  try {
+    const doc = await firestoreRepository.getDocumentById(MOVIES_COLLECTION, id);
+    if (!doc) return null;
+    return { id: doc.id, ...doc.data() } as Movie;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to get movie: ${errorMessage}`);
+  }
 };
 
 /**
- * Creates a new movie
+ * Creates a new movie in Firestore
  * @param movie - Movie data
- * @returns Created movie
+ * @returns Promise resolving to created movie
  */
-export const createMovie = (movie: { title: string; genre: string; releaseYear: number; description: string; rating: number }) => {
-  const newMovie = { id: Date.now().toString(), ...movie };
-  movies.push(newMovie);
-  return newMovie;
+export const createMovie = async (movie: Omit<Movie, "id">): Promise<Movie> => {
+  try {
+    const id = await firestoreRepository.createDocument<Movie>(MOVIES_COLLECTION, movie);
+    return { id, ...movie };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to create movie: ${errorMessage}`);
+  }
 };
 
 /**
- * Updates an existing movie
+ * Updates an existing movie in Firestore
  * @param id - Movie ID
  * @param movie - Updated movie data
- * @returns Updated movie or undefined
+ * @returns Promise resolving to updated movie or null
  */
-export const updateMovie = (id: string, movie: { title: string; genre: string; releaseYear: number; description: string; rating: number }) => {
-  const index = movies.findIndex((m) => m.id === id);
-  if (index === -1) return undefined;
-  movies[index] = { id, ...movie };
-  return movies[index];
+export const updateMovie = async (id: string, movie: Partial<Movie>): Promise<Movie | null> => {
+  try {
+    const existing = await getMovieById(id);
+    if (!existing) return null;
+    await firestoreRepository.updateDocument<Movie>(MOVIES_COLLECTION, id, movie);
+    return { ...existing, ...movie };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to update movie: ${errorMessage}`);
+  }
 };
 
 /**
- * Deletes a movie
+ * Deletes a movie from Firestore
  * @param id - Movie ID
- * @returns Deleted movie or undefined
+ * @returns Promise resolving to deleted movie or null
  */
-export const deleteMovie = (id: string) => {
-  const index = movies.findIndex((m) => m.id === id);
-  if (index === -1) return undefined;
-  const deleted = movies[index];
-  movies.splice(index, 1);
-  return deleted;
+export const deleteMovie = async (id: string): Promise<Movie | null> => {
+  try {
+    const existing = await getMovieById(id);
+    if (!existing) return null;
+    await firestoreRepository.deleteDocument(MOVIES_COLLECTION, id);
+    return existing;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new Error(`Failed to delete movie: ${errorMessage}`);
+  }
 };
