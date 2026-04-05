@@ -59,6 +59,7 @@ export const validateRequest = (
                 const { error, value } = schema.validate(data, {
                     abortEarly: false,
                     stripUnknown: shouldStrip,
+                    presence: "required"
                 });
 
                 if (error) {

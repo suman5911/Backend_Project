@@ -38,15 +38,10 @@ export const getReviewById = async (id: string): Promise<Review | null> => {
  * @param review - Review data
  * @returns Promise resolving to created review
  */
-export const createReview = async (review: Omit<Review, "id" | "createdAt" | "updatedAt">): Promise<Review> => {
+export const createReview = async (review: Omit<Review, "id">): Promise<Review> => {
   try {
-    const newReview = {
-      ...review,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    const id = await firestoreRepository.createDocument<Review>(REVIEWS_COLLECTION, newReview);
-    return { id, ...newReview };
+    const id = await firestoreRepository.createDocument<Review>(REVIEWS_COLLECTION, review);
+    return { id, ...review };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`Failed to create review: ${errorMessage}`);
@@ -63,9 +58,8 @@ export const updateReview = async (id: string, review: Partial<Review>): Promise
   try {
     const existing = await getReviewById(id);
     if (!existing) return null;
-    const updatedReview = { ...review, updatedAt: new Date() };
-    await firestoreRepository.updateDocument<Review>(REVIEWS_COLLECTION, id, updatedReview);
-    return { ...existing, ...updatedReview };
+    await firestoreRepository.updateDocument<Review>(REVIEWS_COLLECTION, id, review);
+    return { ...existing, ...review };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`Failed to update review: ${errorMessage}`);

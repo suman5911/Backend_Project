@@ -8,6 +8,4 @@ export interface Series {
   seasons: number;
   status: string;
   description: string;
-  createdAt: Date;
-  updatedAt: Date;
 }

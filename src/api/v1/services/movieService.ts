@@ -38,15 +38,10 @@ export const getMovieById = async (id: string): Promise<Movie | null> => {
  * @param movie - Movie data
  * @returns Promise resolving to created movie
  */
-export const createMovie = async (movie: Omit<Movie, "id" | "createdAt" | "updatedAt">): Promise<Movie> => {
+export const createMovie = async (movie: Omit<Movie, "id">): Promise<Movie> => {
   try {
-    const newMovie = {
-      ...movie,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    const id = await firestoreRepository.createDocument<Movie>(MOVIES_COLLECTION, newMovie);
-    return { id, ...newMovie };
+    const id = await firestoreRepository.createDocument<Movie>(MOVIES_COLLECTION, movie);
+    return { id, ...movie };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`Failed to create movie: ${errorMessage}`);
@@ -63,9 +58,8 @@ export const updateMovie = async (id: string, movie: Partial<Movie>): Promise<Mo
   try {
     const existing = await getMovieById(id);
     if (!existing) return null;
-    const updatedMovie = { ...movie, updatedAt: new Date() };
-    await firestoreRepository.updateDocument<Movie>(MOVIES_COLLECTION, id, updatedMovie);
-    return { ...existing, ...updatedMovie };
+    await firestoreRepository.updateDocument<Movie>(MOVIES_COLLECTION, id, movie);
+    return { ...existing, ...movie };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`Failed to update movie: ${errorMessage}`);

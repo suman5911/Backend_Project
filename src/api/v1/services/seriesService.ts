@@ -38,15 +38,10 @@ export const getSeriesById = async (id: string): Promise<Series | null> => {
  * @param series - Series data
  * @returns Promise resolving to created series
  */
-export const createSeries = async (series: Omit<Series, "id" | "createdAt" | "updatedAt">): Promise<Series> => {
+export const createSeries = async (series: Omit<Series, "id">): Promise<Series> => {
   try {
-    const newSeries = {
-      ...series,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    const id = await firestoreRepository.createDocument<Series>(SERIES_COLLECTION, newSeries);
-    return { id, ...newSeries };
+    const id = await firestoreRepository.createDocument<Series>(SERIES_COLLECTION, series);
+    return { id, ...series };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`Failed to create series: ${errorMessage}`);
@@ -63,9 +58,8 @@ export const updateSeries = async (id: string, series: Partial<Series>): Promise
   try {
     const existing = await getSeriesById(id);
     if (!existing) return null;
-    const updatedSeries = { ...series, updatedAt: new Date() };
-    await firestoreRepository.updateDocument<Series>(SERIES_COLLECTION, id, updatedSeries);
-    return { ...existing, ...updatedSeries };
+    await firestoreRepository.updateDocument<Series>(SERIES_COLLECTION, id, series);
+    return { ...existing, ...series };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`Failed to update series: ${errorMessage}`);

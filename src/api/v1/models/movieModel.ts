@@ -8,6 +8,4 @@ export interface Movie {
   releaseYear: number;
   description: string;
   rating: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
