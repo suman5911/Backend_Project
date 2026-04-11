@@ -1,6 +1,8 @@
 import express, { Router } from "express";
 import { validateRequest } from "../middleware/validate";
 import { seriesSchemas } from "../validation/seriesSchemas";
+import authenticate from "../middleware/authenticate";
+import isAuthorized from "../middleware/authorize";
 import {
   getAllSeries,
   getSeriesById,
@@ -13,8 +15,8 @@ const router: Router = express.Router();
 
 router.get("/series", getAllSeries);
 router.get("/series/:id", validateRequest(seriesSchemas.getById), getSeriesById);
-router.post("/series", validateRequest(seriesSchemas.create), createSeries);
-router.put("/series/:id", validateRequest(seriesSchemas.update), updateSeries);
-router.delete("/series/:id", validateRequest(seriesSchemas.delete), deleteSeries);
+router.post("/series", authenticate, isAuthorized({ hasRole: ["admin", "manager"] }), validateRequest(seriesSchemas.create), createSeries);
+router.put("/series/:id", authenticate, isAuthorized({ hasRole: ["admin", "manager"] }), validateRequest(seriesSchemas.update), updateSeries);
+router.delete("/series/:id", authenticate, isAuthorized({ hasRole: ["admin"] }), validateRequest(seriesSchemas.delete), deleteSeries);
 
 export default router;
