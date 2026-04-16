@@ -7,6 +7,7 @@ import {
 } from "./api/v1/middleware/logger";
 import errorHandler from "./api/v1/middleware/errorHandler";
 import movieRoutes from "./api/v1/routes/movieRoutes";
+import { limiter } from "./config/rateLimiter";
 import seriesRoutes from "./api/v1/routes/seriesRoutes";
 import reviewRoutes from "./api/v1/routes/reviewRoutes";
 import userRoutes from "./api/v1/routes/userRoutes";
@@ -27,6 +28,7 @@ if (process.env.NODE_ENV === "production") {
 
 // Middleware to parse JSON
 app.use(express.json());
+app.use(limiter);
 
 // Health check endpoint
 app.get("/api/v1/health", (req, res) => {
