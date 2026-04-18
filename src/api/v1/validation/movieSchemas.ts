@@ -1,4 +1,42 @@
 import Joi from "joi";
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Movie:
+ *       type: object
+ *       required:
+ *         - title
+ *         - genre
+ *         - releaseYear
+ *         - description
+ *         - rating
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The unique identifier for a movie
+ *           example: "abc123"
+ *         title:
+ *           type: string
+ *           description: The title of the movie
+ *           example: "Inception"
+ *         genre:
+ *           type: string
+ *           description: The genre of the movie
+ *           example: "Sci-Fi"
+ *         releaseYear:
+ *           type: number
+ *           description: The release year of the movie
+ *           example: 2010
+ *         description:
+ *           type: string
+ *           description: A brief description of the movie
+ *           example: "A mind-bending thriller"
+ *         rating:
+ *           type: number
+ *           description: The rating of the movie out of 10
+ *           example: 8.8
+ */
 
 // Movie operation schemas organized by request part
 export const movieSchemas = {
