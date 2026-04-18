@@ -52,7 +52,18 @@ router.get("/movies/:id", validateRequest(movieSchemas.getById), getMovieById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Movie'
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               genre:
+ *                 type: string
+ *               releaseYear:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *               rating:
+ *                 type: number
  *     responses:
  *       '201':
  *         description: Movie created successfully
@@ -77,6 +88,23 @@ router.post("/movies", authenticate, isAuthorized({ hasRole: ["admin", "manager"
  *         required: true
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               genre:
+ *                 type: string
+ *               releaseYear:
+ *                 type: number
+ *               description:
+ *                 type: string
+ *               rating:
+ *                 type: number
  *     responses:
  *       '200':
  *         description: Movie updated successfully

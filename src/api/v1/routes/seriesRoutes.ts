@@ -3,13 +3,7 @@ import { validateRequest } from "../middleware/validate";
 import { seriesSchemas } from "../validation/seriesSchemas";
 import authenticate from "../middleware/authenticate";
 import isAuthorized from "../middleware/authorize";
-import {
-  getAllSeries,
-  getSeriesById,
-  createSeries,
-  updateSeries,
-  deleteSeries,
-} from "../controllers/seriesController";
+import { getAllSeries, getSeriesById, createSeries, updateSeries, deleteSeries } from "../controllers/seriesController";
 
 const router: Router = express.Router();
 
@@ -58,7 +52,18 @@ router.get("/series/:id", validateRequest(seriesSchemas.getById), getSeriesById)
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Series'
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               genre:
+ *                 type: string
+ *               seasons:
+ *                 type: number
+ *               status:
+ *                 type: string
+ *               description:
+ *                 type: string
  *     responses:
  *       '201':
  *         description: Series created successfully
@@ -83,6 +88,23 @@ router.post("/series", authenticate, isAuthorized({ hasRole: ["admin", "manager"
  *         required: true
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               genre:
+ *                 type: string
+ *               seasons:
+ *                 type: number
+ *               status:
+ *                 type: string
+ *               description:
+ *                 type: string
  *     responses:
  *       '200':
  *         description: Series updated successfully

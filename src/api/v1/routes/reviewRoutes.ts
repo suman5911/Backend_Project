@@ -3,13 +3,7 @@ import { validateRequest } from "../middleware/validate";
 import { reviewSchemas } from "../validation/reviewSchemas";
 import authenticate from "../middleware/authenticate";
 import isAuthorized from "../middleware/authorize";
-import {
-  getAllReviews,
-  getReviewById,
-  createReview,
-  updateReview,
-  deleteReview,
-} from "../controllers/reviewController";
+import { getAllReviews, getReviewById, createReview, updateReview, deleteReview } from "../controllers/reviewController";
 
 const router: Router = express.Router();
 
@@ -58,7 +52,16 @@ router.get("/reviews/:id", validateRequest(reviewSchemas.getById), getReviewById
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Review'
+ *             type: object
+ *             properties:
+ *               targetId:
+ *                 type: string
+ *               targetType:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *               comment:
+ *                 type: string
  *     responses:
  *       '201':
  *         description: Review created successfully
@@ -83,6 +86,21 @@ router.post("/reviews", authenticate, isAuthorized({ hasRole: ["admin", "manager
  *         required: true
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               targetId:
+ *                 type: string
+ *               targetType:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *               comment:
+ *                 type: string
  *     responses:
  *       '200':
  *         description: Review updated successfully
