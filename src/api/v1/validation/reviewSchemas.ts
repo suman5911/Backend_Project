@@ -1,4 +1,38 @@
 import Joi from "joi";
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Review:
+ *       type: object
+ *       required:
+ *         - targetId
+ *         - targetType
+ *         - rating
+ *         - comment
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The unique identifier for a review
+ *           example: "rev456"
+ *         targetId:
+ *           type: string
+ *           description: The ID of the movie or series being reviewed
+ *           example: "abc123"
+ *         targetType:
+ *           type: string
+ *           enum: [movie, series]
+ *           description: Whether the review is for a movie or series
+ *           example: "movie"
+ *         rating:
+ *           type: number
+ *           description: The rating out of 10
+ *           example: 9
+ *         comment:
+ *           type: string
+ *           description: The review comment
+ *           example: "One of the best sci-fi films ever made."
+ */
 
 // Review operation schemas organized by request part
 export const reviewSchemas = {

@@ -1,4 +1,43 @@
 import Joi from "joi";
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Series:
+ *       type: object
+ *       required:
+ *         - title
+ *         - genre
+ *         - seasons
+ *         - status
+ *         - description
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The unique identifier for a series
+ *           example: "xyz789"
+ *         title:
+ *           type: string
+ *           description: The title of the series
+ *           example: "Breaking Bad"
+ *         genre:
+ *           type: string
+ *           description: The genre of the series
+ *           example: "Drama"
+ *         seasons:
+ *           type: number
+ *           description: The number of seasons
+ *           example: 5
+ *         status:
+ *           type: string
+ *           enum: [ongoing, ended]
+ *           description: The current status of the series
+ *           example: "ended"
+ *         description:
+ *           type: string
+ *           description: A brief description of the series
+ *           example: "A chemistry teacher turned drug manufacturer."
+ */
 
 // Series operation schemas organized by request part
 export const seriesSchemas = {
